@@ -19,7 +19,6 @@ namespace ExpressMyselfNovi.Services
 			_cacheService = cacheService;
 			_ip2cService = ip2CService;
 		}
-		//async task
 		public async Task<CountryDTO> GetIPinfo(string ip)
 		{
 			//Cache memory search

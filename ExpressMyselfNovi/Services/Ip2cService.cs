@@ -14,18 +14,18 @@ namespace ExpressMyselfNovi.Services
 		{
 			_httpClient = httpClient;
 		}
-
+		//use web service ip2c for data
 		public async Task<CountryDTO> GetIPinfoAsync(string ip) 
 		{
+			//request
 			string url = $"https://ip2c.org/{ip}";
-
+			//response
 			HttpResponseMessage response = await _httpClient.GetAsync(url);
 
 			if (response.IsSuccessStatusCode)
 			{
-				//141.237.193.10
 				string jsonResponse = await response.Content.ReadAsStringAsync();
-
+				//response not in json
 				string[] parts = jsonResponse.Split(';');
 				if (parts.Length >= 4)
 				{
@@ -44,7 +44,6 @@ namespace ExpressMyselfNovi.Services
 					return country;
 
 				}
-
 				return null;
 			}
 			else 

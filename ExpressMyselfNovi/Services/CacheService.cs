@@ -13,13 +13,14 @@ namespace ExpressMyselfNovi.Services
 		{
 			_memoryCache = memoryCache;
 		}
-
+		//get from cache
 		public CountryDTO GetIPinfoFromCache(string ip) 
 		{
 			_memoryCache.TryGetValue(ip ,out CountryDTO ipAddress);
 			return ipAddress;
 		}
 
+		//save to memory cache
 		public void SetIPinfoToCache(string ip, CountryDTO iPAddress) 
 		{
 			_memoryCache.Set(ip ,iPAddress, _cacheDuration);

@@ -24,6 +24,7 @@ namespace ExpressMyselfNovi
 
 			//db configuration 
 			builder.Services.AddDbContext<IpappDb>(options => options.UseSqlServer(connectionString));
+			//services configuration
 			builder.Services.AddScoped<IpService>();
 			builder.Services.AddScoped<IPupdateService>();
 			builder.Services.AddScoped<IpsPerCountryService>();

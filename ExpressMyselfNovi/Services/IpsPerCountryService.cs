@@ -21,6 +21,7 @@ namespace ExpressMyselfNovi.Services
 							? string.Join(",", countryCodes.Select(c => $"'{c}'"))
 							: null;
 
+			//sql guery as asked
 				var query = @"
                 SELECT c.Name AS CountryName, COUNT(i.IP) AS AddressesCount, MAX(i.UpdatedAt) AS LastAddressUpdated
                 FROM Countries c
@@ -30,7 +31,7 @@ namespace ExpressMyselfNovi.Services
 
 				var whereClause = codes != null ? $"WHERE c.TwoLetterCode IN ({codes})" : string.Empty;
 				query = string.Format(query, whereClause);
-
+			//create report table
 				var ipReport = await _context.Database.SqlQueryRaw<IpsPerCountryDTO>(query).ToListAsync();
 
 				return ipReport;

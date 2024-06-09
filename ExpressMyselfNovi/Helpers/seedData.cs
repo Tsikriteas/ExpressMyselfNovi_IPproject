@@ -20,7 +20,7 @@ namespace ExpressMyselfNovi.Data
 					return;   // Database has been seeded
 				}
 
-				//conflict me foreign keys
+				//conflict me foreign keys fixed
 
 				var countries = new[]
 				{
