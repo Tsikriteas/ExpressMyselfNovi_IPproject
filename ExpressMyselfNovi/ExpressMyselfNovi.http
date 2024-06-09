@@ -1,0 +1,6 @@
+@ExpressMyselfNovi_HostAddress = http://localhost:5119
+
+GET {{ExpressMyselfNovi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
