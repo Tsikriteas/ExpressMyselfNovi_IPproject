@@ -1,5 +1,6 @@
 ﻿using ExpressMyselfNovi.Data;
 using ExpressMyselfNovi.Helpers;
+using ExpressMyselfNovi.Interfaces;
 using ExpressMyselfNovi.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -12,12 +13,14 @@ namespace ExpressMyselfNovi.Services
 		private readonly IpappDb _context;
 		private readonly CacheService _cacheService;
 		private readonly Ip2cService _ip2cService;
+		private readonly ICountryDtoFactory _countryDtoFactory;
 
-		public IpService(IpappDb context, CacheService cacheService, Ip2cService ip2CService) 
+		public IpService(IpappDb context, CacheService cacheService, Ip2cService ip2CService, ICountryDtoFactory countryDtoFactory) 
 		{
 			_context = context;
 			_cacheService = cacheService;
 			_ip2cService = ip2CService;
+			_countryDtoFactory = countryDtoFactory;
 		}
 		public async Task<CountryDTO> GetIPinfo(string ip)
 		{
@@ -25,7 +28,7 @@ namespace ExpressMyselfNovi.Services
 			CountryDTO ipInfo = _cacheService.GetIPinfoFromCache(ip);
 			if (ipInfo != null)
 			{
-				return ipInfo;
+				return _countryDtoFactory.CreateFromCache(ipInfo); ;
 			}
 
 			//database search
@@ -35,21 +38,17 @@ namespace ExpressMyselfNovi.Services
 				.FirstOrDefaultAsync(x => x.IP ==  ip);
 			if (DBipInfo != null)
 			{
-				var ipInfos = new CountryDTO
-				{
-					Id = DBipInfo.Country.Id.ToString(),
-					Name = DBipInfo.Country.Name,
-					TwoLetterCode = DBipInfo.Country.TwoLetterCode,
-					ThreeLetterCode = DBipInfo.Country.ThreeLetterCode
-				};
+				var ipInfos = _countryDtoFactory.CreateFromDatabase(DBipInfo);
 				_cacheService.SetIPinfoToCache(ip, ipInfo);
 				return ipInfos;
 			}
 
 			//IP2C call
-			ipInfo = await _ip2cService.GetIPinfoAsync(ip);
-			if (ipInfo != null) 
+			var apiData = await _ip2cService.GetIPinfoAsync(ip);
+			if (apiData != null) 
 			{
+				ipInfo = _countryDtoFactory.CreateFromApi(apiData);
+
 				DateTime localDateTime = DateTime.Now;
 			
 				var newCountry = new Country

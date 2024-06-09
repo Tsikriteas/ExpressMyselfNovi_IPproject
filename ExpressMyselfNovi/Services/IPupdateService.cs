@@ -1,4 +1,6 @@
 ﻿using ExpressMyselfNovi.Data;
+using ExpressMyselfNovi.Helpers;
+using ExpressMyselfNovi.Interfaces;
 using System.Threading;
 
 namespace ExpressMyselfNovi.Services
@@ -9,13 +11,16 @@ namespace ExpressMyselfNovi.Services
 		private readonly Ip2cService _ip2CService;
 		private readonly IpappDb _context;
 		private readonly CacheService _cacheService;
+		private readonly ICountryDtoFactory _countryDtoFactory;
 
-		public IPupdateService(Ip2cService ip2CService, IpappDb context, CacheService cacheService) 
+		public IPupdateService(Ip2cService ip2CService, IpappDb context, ICountryDtoFactory countryDtoFactory, CacheService cacheService) 
 		{
 			_context = context;
 			_ip2CService = ip2CService;
 			_cacheService = cacheService;
+			_countryDtoFactory = countryDtoFactory;
 			_timer = new Timer(Update, null, TimeSpan.Zero, TimeSpan.FromHours(1));
+
 		}
 		//TO see private
 		public async void Update(Object state) 
@@ -32,12 +37,16 @@ namespace ExpressMyselfNovi.Services
 				{
 					foreach(var ip in batch) 
 					{
-						var ipInfo = await _ip2CService.GetIPinfoAsync(ip);
+						var apiData = await _ip2CService.GetIPinfoAsync(ip);
+						if (apiData == null) continue;
+
+						var ipInfo = _countryDtoFactory.CreateFromApi(apiData);
+
 						//find in database and if its diferent update
 						var ipDB = _context.IPAddresses.FirstOrDefault(c => c.IP == ip);
 						if (ipDB != null)
 						{
-							var country = _context.Countries.FirstOrDefault(c => c.Id == ipDB.CountryId);
+							var country = ipDB.Country;
 							if (country != null)
 							{
 								DateTime localDateTime = DateTime.Now;
@@ -49,7 +58,7 @@ namespace ExpressMyselfNovi.Services
 									country.ThreeLetterCode = ipInfo.ThreeLetterCode;
 									country.CreatedAt = localDateTime; 
 
-									_context.SaveChanges(); 
+									_context.SaveChangesAsync(); 
 								}
 							}
 						}

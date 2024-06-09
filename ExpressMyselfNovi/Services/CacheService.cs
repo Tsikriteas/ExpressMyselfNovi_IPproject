@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using ExpressMyselfNovi.Helpers;
 using ExpressMyselfNovi.Models;
+using ExpressMyselfNovi.Interfaces;
 
 namespace ExpressMyselfNovi.Services
 {
-	public class CacheService
+	public class CacheService : ICacheService
 	{
 		private readonly IMemoryCache _memoryCache;
 		private readonly TimeSpan _cacheDuration = TimeSpan.FromSeconds(1);

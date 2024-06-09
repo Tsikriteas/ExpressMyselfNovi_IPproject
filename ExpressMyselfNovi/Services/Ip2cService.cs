@@ -3,10 +3,11 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using ExpressMyselfNovi.Models;
 using System.Diagnostics.Metrics;
+using ExpressMyselfNovi.Interfaces;
 
 namespace ExpressMyselfNovi.Services
 {
-	public class Ip2cService
+	public class Ip2cService : Iip2cService
 	{
 		private readonly HttpClient _httpClient;
 
@@ -15,7 +16,7 @@ namespace ExpressMyselfNovi.Services
 			_httpClient = httpClient;
 		}
 		//use web service ip2c for data
-		public async Task<CountryDTO> GetIPinfoAsync(string ip) 
+		public async Task<string[]> GetIPinfoAsync(string ip) 
 		{
 			//request
 			string url = $"https://ip2c.org/{ip}";
@@ -29,19 +30,8 @@ namespace ExpressMyselfNovi.Services
 				string[] parts = jsonResponse.Split(';');
 				if (parts.Length >= 4)
 				{
-					string id = parts[0];
-					string twoLetterCode = parts[1];
-					string threeLetterCode = parts[2];
-					string name = parts[3];
-
-					CountryDTO country = new CountryDTO
-					{
-						Id = id,
-						TwoLetterCode = twoLetterCode,
-						ThreeLetterCode = threeLetterCode,
-						Name = name
-					};
-					return country;
+					
+					return parts;
 
 				}
 				return null;

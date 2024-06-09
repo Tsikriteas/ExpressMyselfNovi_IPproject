@@ -1,6 +1,7 @@
-
 using ExpressMyselfNovi.Data;
+using ExpressMyselfNovi.Interfaces;
 using ExpressMyselfNovi.Services;
+using ExpressMyselfNovi.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
@@ -28,6 +29,8 @@ namespace ExpressMyselfNovi
 			builder.Services.AddScoped<IpService>();
 			builder.Services.AddScoped<IPupdateService>();
 			builder.Services.AddScoped<IpsPerCountryService>();
+			//cache only one 
+			builder.Services.AddScoped<ICountryDtoFactory, CountryDtoFactory>();
 			builder.Services.AddSingleton<CacheService>();
 			builder.Services.AddHttpClient<Ip2cService>();
 			builder.Services.AddMemoryCache();
